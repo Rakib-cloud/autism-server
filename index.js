@@ -22,7 +22,9 @@ async function run() {
         await client.connect();
         const database = client.db("Autism");
         const courseCollection = database.collection("courses");
+        const userCollection = database.collection("users");
 
+        // add course endpoints
         app.post('/course', async (req, res) => {
 
             const data = req.body;
@@ -32,20 +34,49 @@ async function run() {
         });
 
 
-        app.get('/course',async (req,res) => {
+        app.get('/course', async (req, res) => {
 
-            const result = await courseCollection.find({}).toArray()
+            const result = await courseCollection.find({}).toArray();
             res.send(result);
 
-        })
+        });
 
-        app.get('/course/:id', async(req, res) =>{
+        app.get('/course/:id', async (req, res) => {
             const id = req.params.id;
-            const query={_id:ObjectId(id)}
-            const course=await courseCollection.findOne(query)
+            const query = { _id: ObjectId(id) };
+            const course = await courseCollection.findOne(query);
             res.send(course);
         });
 
+        // add users endpoint
+
+        /* user schema
+        {
+            email:'xyz@gmail.com',
+            courses:[]
+        } */
+
+        app.post('/users', async (req, res) => {
+
+            const data = req.body;
+            const result = await userCollection.insertOne(data);
+            res.json(result);
+
+        });
+
+        app.get('/users', async (req, res) => {
+
+            const result = await userCollection.find({}).toArray();
+            res.send(result);
+
+        });
+
+        app.get('/users/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email };
+            const course = await userCollection.findOne(query);
+            res.send(course);
+        });
 
     } finally {
         // await client.close();
