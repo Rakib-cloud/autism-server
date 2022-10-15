@@ -64,6 +64,27 @@ async function run() {
 
         });
 
+        app.put('/users', async (req, res) => {
+
+            const data = req.body;
+            const filter = { email: req.body.email };
+            const options = { upsert: true };
+            const updateDoc = { $set: data };
+            const result = await userCollection.updateOne(filter, updateDoc, options);
+            res.json(result);
+
+        });
+
+        app.put('/users/:id', async (req, res) => {
+
+            const data = req.body;
+            const filter = { email: req.body.email };
+            const updateDoc = { $set: data };
+            const result = await userCollection.updateOne(filter, updateDoc);
+            res.json(result);
+
+        });
+
         app.get('/users', async (req, res) => {
 
             const result = await userCollection.find({}).toArray();
@@ -84,4 +105,4 @@ async function run() {
 
 } run().catch(console.dir);
 
-app.listen(port, () => console.log("response from port", port));
+app.listen(port, () => console.log(`response from http://localhost:${port}`));
