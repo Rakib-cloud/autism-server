@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+
 const { MongoClient } = require('mongodb');
 const ObjectId = require('mongodb').ObjectId;
 require('dotenv').config();
@@ -98,6 +99,8 @@ async function run() {
             const course = await userCollection.findOne(query);
             res.send(course);
         });
+
+       
 
     } finally {
         // await client.close();
