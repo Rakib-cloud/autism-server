@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
-    res.send("<div style='display:flex;height:96vh;justify-content: center;align-items: center;'><h1>Autism Care Server Running!</h1></div>");
+    res.send("<div style='display:flex;height:96vh;justify-content: center;align-items: center;'><h1>product server running!</h1></div>");
 });
 
 const client = new MongoClient(process.env.DB_URL, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -21,84 +21,49 @@ async function run() {
     try {
 
         await client.connect();
-        const database = client.db("Autism");
-        const courseCollection = database.collection("courses");
-        const userCollection = database.collection("users");
+        const database = client.db("Productdata");
+        const productCollection = database.collection("products");
+        const adminCollection = database.collection("homepages");
 
         // add course endpoints
-        app.post('/course', async (req, res) => {
+        app.post('/product', async (req, res) => {
 
             const data = req.body;
-            const result = await courseCollection.insertOne(data);
+            const result = await productCollection.insertOne(data);
             res.json(result);
 
         });
 
 
-        app.get('/course', async (req, res) => {
+        app.post('/homepage', async (req, res) => {
 
-            const result = await courseCollection.find({}).toArray();
+            const data = req.body;
+            const result = await adminCollection.insertOne(data);
+            res.json(result);
+
+        });
+
+        app.get('/product', async (req, res) => {
+
+            const result = await productCollection.find({}).toArray();
+            res.send(result);
+
+        });
+        app.get('/homepage', async (req, res) => {
+
+            const result = await adminCollection.find({}).toArray();
             res.send(result);
 
         });
 
-        app.get('/course/:id', async (req, res) => {
+        app.get('/product/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
-            const course = await courseCollection.findOne(query);
-            res.send(course);
+            const product = await productCollection.findOne(query);
+            res.send(product);
         });
 
-        // add users endpoint
-
-        /* user schema
-        {
-            email:'xyz@gmail.com',
-            courses:[]
-        } */
-
-        app.post('/users', async (req, res) => {
-
-            const data = req.body;
-            const result = await userCollection.insertOne(data);
-            res.json(result);
-
-        });
-
-        app.put('/users', async (req, res) => {
-
-            const data = req.body;
-            const filter = { email: req.body.email };
-            const options = { upsert: true };
-            const updateDoc = { $set: data };
-            const result = await userCollection.updateOne(filter, updateDoc, options);
-            res.json(result);
-
-        });
-
-        app.put('/users/:id', async (req, res) => {
-
-            const data = req.body;
-            const filter = { email: req.body.email };
-            const updateDoc = { $set: data };
-            const result = await userCollection.updateOne(filter, updateDoc);
-            res.json(result);
-
-        });
-
-        app.get('/users', async (req, res) => {
-
-            const result = await userCollection.find({}).toArray();
-            res.send(result);
-
-        });
-
-        app.get('/users/:email', async (req, res) => {
-            const email = req.params.email;
-            const query = { email };
-            const course = await userCollection.findOne(query);
-            res.send(course);
-        });
+        
 
        
 
